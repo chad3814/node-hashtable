@@ -1,0 +1,25 @@
+{
+    "name": "hashtable",
+    "version": "0.1.0",
+    "description": "Native hashtable interface for when V8 objects can't take the heat",
+    "main": "./index.js",
+    "keywords": [
+        "hash",
+        "map",
+        "hashmap",
+        "hashtable",
+        "containers"
+    ],
+    "author": {
+        "name": "Isaac Wagner",
+        "email": "isaacbwagner@gmail.com"
+    },
+    "engines": {
+        "node": "*"
+    },
+    "license": "MIT",
+    "scripts": {
+        "install": "node-gyp configure build",
+        "test": "tap test/*.js"
+    }
+}
