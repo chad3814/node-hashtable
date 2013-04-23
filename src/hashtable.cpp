@@ -8,14 +8,16 @@ void HashTable::init(Handle<Object> exports) {
   Local<FunctionTemplate> constructor = FunctionTemplate::New(Constructor);
   constructor->SetClassName(String::NewSymbol("HashTable"));
   constructor->InstanceTemplate()->SetInternalFieldCount(1);
-  constructor->PrototypeTemplate()->Set(String::New("put"), FunctionTemplate::New(Put)->GetFunction());
-  constructor->PrototypeTemplate()->Set(String::New("get"), FunctionTemplate::New(Get)->GetFunction());
-  constructor->PrototypeTemplate()->Set(String::New("remove"), FunctionTemplate::New(Remove)->GetFunction());
-  constructor->PrototypeTemplate()->Set(String::New("clear"), FunctionTemplate::New(Clear)->GetFunction());
-  constructor->PrototypeTemplate()->Set(String::New("size"), FunctionTemplate::New(Size)->GetFunction());
-  constructor->PrototypeTemplate()->Set(String::New("rehash"), FunctionTemplate::New(Rehash)->GetFunction());
-  constructor->PrototypeTemplate()->Set(String::New("reserve"), FunctionTemplate::New(Reserve)->GetFunction());
-  constructor->PrototypeTemplate()->Set(String::New("max_load_factor"), FunctionTemplate::New(MaxLoadFactor)->GetFunction());
+
+  auto prototype = constructor->PrototypeTemplate();
+  prototype->Set("put", FunctionTemplate::New(Put)->GetFunction());
+  prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
+  prototype->Set("remove", FunctionTemplate::New(Remove)->GetFunction());
+  prototype->Set("clear", FunctionTemplate::New(Clear)->GetFunction());
+  prototype->Set("size", FunctionTemplate::New(Size)->GetFunction());
+  prototype->Set("rehash", FunctionTemplate::New(Rehash)->GetFunction());
+  prototype->Set("reserve", FunctionTemplate::New(Reserve)->GetFunction());
+  prototype->Set("max_load_factor", FunctionTemplate::New(MaxLoadFactor)->GetFunction());
 
   exports->Set(String::NewSymbol("HashTable"), Persistent<Function>::New(constructor->GetFunction()));
 }
