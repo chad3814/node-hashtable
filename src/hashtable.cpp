@@ -31,8 +31,8 @@ HashTable::~HashTable() {}
 Handle<Value> HashTable::Constructor(const Arguments& args) {
   HashTable *obj;
 
-  if(args.Length() > 0 && (*args[0])->IsInt32()) {
-    int buckets = (*args[0])->Int32Value();
+  if(args.Length() > 0 && args[0]->IsInt32()) {
+    int buckets = args[0]->Int32Value();
     obj = new HashTable(buckets);
   } else {
     obj = new HashTable();
@@ -139,7 +139,7 @@ Handle<Value> HashTable::Rehash(const Arguments& args) {
 
   HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-  size_t buckets = (*args[0])->Int32Value();
+  size_t buckets = args[0]->Int32Value();
 
   obj->map.rehash(buckets);
 
@@ -151,7 +151,7 @@ Handle<Value> HashTable::Reserve(const Arguments& args) {
 
   HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-  size_t elements = (*args[0])->Int32Value();
+  size_t elements = args[0]->Int32Value();
 
   obj->map.rehash(elements);
 
