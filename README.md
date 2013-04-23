@@ -7,7 +7,7 @@ To install, simply:
 
     npm install hashtable
     
-"But Isaac, javascript already has hash tables! They're called objects, dumdum"
+"But Isaac, javascript already has hash tables! They're called objects, dummy"
 ---
 
 V8 is great, but was never really meant for driving large software systems. Try adding a few million non-integer keys (V8 does some magic when all the keys are integers) to an object and you'll start to see things bog down. This module is *not* intended to be a general replacement for javascript objects (that would be silly). Instead, it is meant to be used when you need maps large than V8's virtual machine can handle.
