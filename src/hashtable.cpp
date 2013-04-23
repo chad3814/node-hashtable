@@ -38,24 +38,6 @@ Handle<Value> HashTable::Constructor(const Arguments& args) {
   return args.This();
 }
 
-Handle<Value> HashTable::Put(const Arguments& args) {
-  HandleScope scope;
-
-  Local<Value> key = Local<Value>(args[0]);
-  Local<Value> value = Local<Value>(args[1]);
-
-  String::AsciiValue keyStr(key);
-
-  Persistent<Value> persistent = Persistent<Value>::New(value);
-
-  HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
-  //obj->map.insert(std::pair<std::string, Persistent<Value>>(std::string(*ascii), persistent));
-  obj->map.insert(std::pair<std::string, Persistent<Value>>(std::string(*keyStr), persistent));
-
-  //Return undefined
-  return scope.Close(Handle<Value>());
-}
-
 Handle<Value> HashTable::Get(const Arguments& args) {
   HandleScope scope;
 
@@ -74,6 +56,24 @@ Handle<Value> HashTable::Get(const Arguments& args) {
   Persistent<Value> value = itr->second;
 
   return scope.Close(value);
+}
+
+Handle<Value> HashTable::Put(const Arguments& args) {
+  HandleScope scope;
+
+  Local<Value> key = Local<Value>(args[0]);
+  Local<Value> value = Local<Value>(args[1]);
+
+  String::AsciiValue keyStr(key);
+
+  Persistent<Value> persistent = Persistent<Value>::New(value);
+
+  HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+  //obj->map.insert(std::pair<std::string, Persistent<Value>>(std::string(*ascii), persistent));
+  obj->map.insert(std::pair<std::string, Persistent<Value>>(std::string(*keyStr), persistent));
+
+  //Return undefined
+  return scope.Close(Handle<Value>());
 }
 
 Handle<Value> HashTable::Size(const Arguments& args) {
