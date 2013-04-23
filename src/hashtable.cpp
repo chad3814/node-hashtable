@@ -45,13 +45,12 @@ Handle<Value> HashTable::Put(const Arguments& args) {
   Local<Value> value = Local<Value>(args[1]);
 
   String::AsciiValue keyStr(key);
-  String::AsciiValue valueStr(value);
 
-  //Persistent<Value> persistent = Persistent<Value>::New(value);
+  Persistent<Value> persistent = Persistent<Value>::New(value);
 
   HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
   //obj->map.insert(std::pair<std::string, Persistent<Value>>(std::string(*ascii), persistent));
-  obj->map.insert(std::pair<std::string, std::string>(std::string(*keyStr), std::string(*valueStr)));
+  obj->map.insert(std::pair<std::string, Persistent<Value>>(std::string(*keyStr), persistent));
 
   //Return undefined
   return scope.Close(Handle<Value>());
@@ -66,20 +65,13 @@ Handle<Value> HashTable::Get(const Arguments& args) {
   Local<Value> key = Local<Value>(args[0]);
   String::AsciiValue keyStr(key);
 
-  //std::unordered_map<std::string,Persistent<Value>>::const_iterator itr = obj->map.find(std::string(*keyAscii));
-  std::unordered_map<std::string,std::string>::const_iterator itr = obj->map.find(std::string(*keyStr));
+  MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
 
   if(itr == obj->map.end()) {
-    return Handle<Value>(); //undefined
+    return scope.Close(Handle<Value>()); //return undefined
   } 
 
-  /*Persistent<Value> persistent = itr->second;
-  String::AsciiValue persistentAscii(persistent);
-  std::cout << "key: '" << *keyAscii << "' value: '" << *persistentAscii << "'" << std::endl;*/
-  //Handle<Value> value = itr->second;
-
-  std::string str = itr->second;
-  Handle<Value> value = String::New(str.c_str());
+  Persistent<Value> value = itr->second;
 
   return scope.Close(value);
 }
