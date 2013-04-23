@@ -22,7 +22,7 @@ Everything you might want to do first requires a new HashMap object (which corre
     
     hashtable.put('key', {value: 'value'});
 
-    console.log(hashtable.get('key));
+    console.log(hashtable.get('key'));
     
     ...
     
