@@ -19,8 +19,6 @@ void HashTable::init(Handle<Object> exports) {
   prototype->Set("reserve", FunctionTemplate::New(Reserve)->GetFunction());
   prototype->Set("max_load_factor", FunctionTemplate::New(MaxLoadFactor)->GetFunction());
 
-  //prototype->SetNamedPropertyHandler(GetNamedProperty, SetNamedProperty);
-
   exports->Set(String::NewSymbol("HashTable"), Persistent<Function>::New(constructor->GetFunction()));
 }
 
@@ -44,22 +42,6 @@ Handle<Value> HashTable::Constructor(const Arguments& args) {
 
   return args.This();
 }
-
-/*
-Handle<Value> HashTable::GetNamedProperty(Local<String> key, const AccessorInfo &info) {
-  HandleScope scope;
-  String::AsciiValue keyStr(key);
-  std::cout << "GetNamedProperty() " << *keyStr << std::endl;
-  return scope.Close(Local<Value>());
-}
-
-Handle<Value> HashTable::SetNamedProperty(Local<String> key, Local<Value> value, const AccessorInfo &info) {
-  HandleScope scope;
-  String::AsciiValue keyStr(key);
-  std::cout << "SetNamedProperty() " << *keyStr << std::endl;
-  return scope.Close(Local<Value>());
-}
-*/
 
 Handle<Value> HashTable::Get(const Arguments& args) {
   HandleScope scope;
