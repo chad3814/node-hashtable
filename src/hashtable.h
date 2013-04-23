@@ -39,6 +39,9 @@ class HashTable : public node::ObjectWrap {
 
   //hashTable.reserve(size)
   static v8::Handle<v8::Value> Reserve(const v8::Arguments &args);
+
+  //hashTable.max_load_factor() or hashTable.max_load_factor(factor)
+  static v8::Handle<v8::Value> MaxLoadFactor(const v8::Arguments &args);
 };
 
 #endif

@@ -13,6 +13,9 @@ void HashTable::init(Handle<Object> exports) {
   constructor->PrototypeTemplate()->Set(String::New("remove"), FunctionTemplate::New(Remove)->GetFunction());
   constructor->PrototypeTemplate()->Set(String::New("clear"), FunctionTemplate::New(Clear)->GetFunction());
   constructor->PrototypeTemplate()->Set(String::New("size"), FunctionTemplate::New(Size)->GetFunction());
+  constructor->PrototypeTemplate()->Set(String::New("rehash"), FunctionTemplate::New(Rehash)->GetFunction());
+  constructor->PrototypeTemplate()->Set(String::New("reserve"), FunctionTemplate::New(Reserve)->GetFunction());
+  constructor->PrototypeTemplate()->Set(String::New("max_load_factor"), FunctionTemplate::New(MaxLoadFactor)->GetFunction());
 
   exports->Set(String::NewSymbol("HashTable"), Persistent<Function>::New(constructor->GetFunction()));
 }
@@ -28,7 +31,6 @@ Handle<Value> HashTable::Constructor(const Arguments& args) {
 
   if(args.Length() > 0 && (*args[0])->IsInt32()) {
     int buckets = (*args[0])->Int32Value();
-    std::cout << "HashTable(" << buckets << ")" << std::endl;
     obj = new HashTable(buckets);
   } else {
     obj = new HashTable();
@@ -130,3 +132,45 @@ Handle<Value> HashTable::Size(const Arguments& args) {
   return scope.Close(Integer::New(obj->map.size()));
 }
 
+Handle<Value> HashTable::Rehash(const Arguments& args) {
+  HandleScope scope;
+
+  HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+  size_t buckets = (*args[0])->Int32Value();
+
+  obj->map.rehash(buckets);
+
+  return scope.Close(Local<Value>());
+}
+
+Handle<Value> HashTable::Reserve(const Arguments& args) {
+  HandleScope scope;
+
+  HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+  size_t elements = (*args[0])->Int32Value();
+
+  obj->map.rehash(elements);
+
+  return scope.Close(Local<Value>());
+}
+
+Handle<Value> HashTable::MaxLoadFactor(const Arguments& args) {
+  HandleScope scope;
+
+  HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+  if(args.Length() > 0) {
+    Number *num = static_cast<Number*>(*args[0]);
+    float factor = (float)num->Value();
+
+    obj->map.max_load_factor(factor);
+
+    return scope.Close(Local<Value>());
+  } else {
+    float factor = obj->map.max_load_factor();
+
+    return scope.Close(Number::New((double)factor));
+  }
+}
