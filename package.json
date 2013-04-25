@@ -8,7 +8,7 @@
         "map",
         "hashmap",
         "hashtable",
-        "containers"
+        "container"
     ],
     "author": {
         "name": "Isaac Wagner",
@@ -18,8 +18,12 @@
         "node": "*"
     },
     "license": "MIT",
+    "devDependencies": {
+        "test-more": "~0.1.0",
+        "runtests": "~0.1.0"
+    },
     "scripts": {
         "install": "node-gyp configure build",
-        "test": "tap test/*.js"
+        "test": "runtests test/*.js"
     }
 }
