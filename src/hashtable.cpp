@@ -166,8 +166,8 @@ Handle<Value> HashTable::MaxLoadFactor(const Arguments& args) {
   if(args.Length() > 0) {
     Number *num = static_cast<Number*>(*args[0]);
     float factor = (float)num->Value();
-
-    obj->map.max_load_factor(factor);
+    if(factor > 0)
+      obj->map.max_load_factor(factor);
 
     return scope.Close(Local<Value>());
   } else {
