@@ -12,6 +12,7 @@ void HashTable::init(Handle<Object> exports) {
   auto prototype = constructor->PrototypeTemplate();
   prototype->Set("put", FunctionTemplate::New(Put)->GetFunction());
   prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
+  prototype->Set("keys", FunctionTemplate::New(Keys)->GetFunction());
   prototype->Set("remove", FunctionTemplate::New(Remove)->GetFunction());
   prototype->Set("clear", FunctionTemplate::New(Clear)->GetFunction());
   prototype->Set("size", FunctionTemplate::New(Size)->GetFunction());
@@ -94,6 +95,21 @@ Handle<Value> HashTable::Put(const Arguments& args) {
 
   //Return undefined
   return scope.Close(Local<Value>());
+}
+
+Handle<Value> HashTable::Keys(const Arguments& args) {
+  HandleScope scope;
+
+  HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+  Local<Array> array = Array::New();
+
+  int i = 0;
+  for(auto itr = obj->map.begin(); itr != obj->map.end(); ++itr, ++i) {
+    array->Set(Integer::New(i), String::New(itr->first.c_str()));
+  }
+
+  return scope.Close(array);
 }
 
 Handle<Value> HashTable::Remove(const Arguments& args) {

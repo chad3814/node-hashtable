@@ -1,6 +1,6 @@
 {
     "name": "hashtable",
-    "version": "0.1.1",
+    "version": "0.1.1-pre",
     "description": "Native hashtables for Node.js",
     "main": "./index.js",
     "keywords": [
@@ -19,7 +19,7 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "test-more": "~0.1.0",
+        "test-more": "~0.1.1",
         "runtests": "~0.1.0"
     },
     "scripts": {

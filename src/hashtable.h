@@ -25,6 +25,9 @@ class HashTable : public node::ObjectWrap {
   //hashTable.put(key, value)
   static v8::Handle<v8::Value> Put(const v8::Arguments &args);
 
+  //hashTable.keys() : []
+  static v8::Handle<v8::Value> Keys(const v8::Arguments &args);
+
   //hashTable.remove(key)
   static v8::Handle<v8::Value> Remove(const v8::Arguments &args);
 
