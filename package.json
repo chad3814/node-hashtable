@@ -1,7 +1,7 @@
 {
     "name": "hashtable",
-    "version": "0.1.0",
-    "description": "Native hashtable interface for when V8 objects can't take the heat",
+    "version": "0.1.1",
+    "description": "Native hashtables for Node.js",
     "main": "./index.js",
     "keywords": [
         "hash",
