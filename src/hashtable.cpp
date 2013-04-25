@@ -26,7 +26,14 @@ HashTable::HashTable() {}
 
 HashTable::HashTable(size_t buckets) : map(buckets) {}
 
-HashTable::~HashTable() {}
+HashTable::~HashTable() {
+  for(auto itr = this->map.begin(); itr != this->map.end(); ) {
+    Persistent<Value> value = itr->second;
+    value.Dispose();
+
+    itr = this->map.erase(itr);
+  }
+}
 
 Handle<Value> HashTable::Constructor(const Arguments& args) {
   HashTable *obj;
