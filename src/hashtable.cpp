@@ -60,7 +60,7 @@ Handle<Value> HashTable::Get(const Arguments& args) {
   Local<Value> key = Local<Value>(args[0]);
   String::AsciiValue keyStr(key);
 
-  MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
+  auto itr = obj->map.find(std::string(*keyStr));
 
   if(itr == obj->map.end()) {
     return scope.Close(Handle<Value>()); //return undefined
@@ -81,7 +81,7 @@ Handle<Value> HashTable::Put(const Arguments& args) {
 
   String::AsciiValue keyStr(key);
 
-  MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
+  auto itr = obj->map.find(std::string(*keyStr));
 
   //overwriting an existing value
   if(itr != obj->map.end()) {
