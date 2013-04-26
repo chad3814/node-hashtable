@@ -1,6 +1,6 @@
 {
     "name": "hashtable",
-    "version": "0.1.1",
+    "version": "0.1.2-pre",
     "description": "Native hashtables for Node.js",
     "main": "./index.js",
     "keywords": [
