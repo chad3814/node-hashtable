@@ -5,7 +5,7 @@
 
 #ifdef __APPLE__
 #include <tr1/unordered_map>
-typedef std::tr1::unordered_map<std::string,v8::Persistent<v8::Value>> unordered_map;
+typedef std::tr1::unordered_map<std::string,v8::Persistent<v8::Value> > unordered_map;
 #else
 #include <unordered_map>
 typedef std::unordered_map<std::string,v8::Persistent<v8::Value>> unordered_map;
