@@ -2,7 +2,13 @@
 #define HASHTABLE_H
 
 #include <node.h>
+#ifdef __APPLE__
+#include <tr1/unordered_map>
+#define UNORDERED_MAP_TYPE std::tr1::unordered_map
+#else
 #include <unordered_map>
+#define UNORDERED_MAP_TYPE std::unordered_map
+#endif
 
 class HashTable : public node::ObjectWrap {
  public:
@@ -13,7 +19,7 @@ class HashTable : public node::ObjectWrap {
   HashTable(size_t buckets);
   ~HashTable();
 
-  typedef std::unordered_map<std::string,v8::Persistent<v8::Value>> MapType;
+  typedef UNORDERED_MAP_TYPE<std::string,v8::Persistent<v8::Value> > MapType;
   MapType map;
 
   //new HashTable() or new HashTable(buckets)
