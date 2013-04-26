@@ -4,10 +4,10 @@
 #include <node.h>
 #ifdef __APPLE__
 #include <tr1/unordered_map>
-#define UNORDERED_MAP_TYPE std::tr1::unordered_map
+#define unordered_map std::tr1::unordered_map
 #else
 #include <unordered_map>
-#define UNORDERED_MAP_TYPE std::unordered_map
+#define unordered_map std::unordered_map
 #endif
 
 class HashTable : public node::ObjectWrap {
@@ -19,7 +19,7 @@ class HashTable : public node::ObjectWrap {
   HashTable(size_t buckets);
   ~HashTable();
 
-  typedef UNORDERED_MAP_TYPE<std::string,v8::Persistent<v8::Value> > MapType;
+  typedef unordered_map<std::string,v8::Persistent<v8::Value> > MapType;
   MapType map;
 
   //new HashTable() or new HashTable(buckets)
