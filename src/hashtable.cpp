@@ -90,7 +90,7 @@ Handle<Value> HashTable::Put(const Arguments& args) {
 
   Persistent<Value> persistent = Persistent<Value>::New(value);
 
-  obj->map.insert(std::pair<std::string, Persistent<Value>>(std::string(*keyStr), persistent));
+  obj->map.insert(std::pair<std::string, Persistent<Value> >(std::string(*keyStr), persistent));
 
   //Return undefined
   return scope.Close(Local<Value>());
