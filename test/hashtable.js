@@ -1,5 +1,5 @@
 var HashMap = require('..'),
-    test = require('test-more')();
+    test = require('test-more')(5);
 
 var hashmap = new HashMap();
 
