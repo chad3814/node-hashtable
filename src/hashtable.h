@@ -2,6 +2,7 @@
 #define HASHTABLE_H
 
 #include <node.h>
+#include <string>
 #ifdef __APPLE__
 #include <tr1/unordered_map>
 #define unordered_map std::tr1::unordered_map
