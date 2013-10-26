@@ -1,7 +1,7 @@
 HashTable
 =========
 
-![](https://travis-ci.org/isaacbw/node-hashtable.png?branch=master)
+[<img src="https://travis-ci.org/isaacbw/node-hashtable.png?branch=master" />](https://travis-ci.org/isaacbw/node-hashtable)
 
 Sometimes you need to store so much data in memory that V8 can get a bit clogged up. This Node.js module provides an interface to a native hashmap data structure that exists outside of V8's memory constraints.
 
