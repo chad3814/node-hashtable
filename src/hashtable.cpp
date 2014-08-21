@@ -21,6 +21,7 @@ void HashTable::init(Handle<Object> exports) {
   prototype->Set("rehash", FunctionTemplate::New(Rehash)->GetFunction());
   prototype->Set("reserve", FunctionTemplate::New(Reserve)->GetFunction());
   prototype->Set("max_load_factor", FunctionTemplate::New(MaxLoadFactor)->GetFunction());
+  prototype->Set("forEach", FunctionTemplate::New(ForEach)->GetFunction());
 
   exports->Set(String::NewSymbol("HashTable"), Persistent<Function>::New(constructor->GetFunction()));
 }
@@ -66,7 +67,7 @@ Handle<Value> HashTable::Get(const Arguments& args) {
 
   if(itr == obj->map.end()) {
     return scope.Close(Handle<Value>()); //return undefined
-  } 
+  }
 
   Persistent<Value> value = itr->second;
 
@@ -89,7 +90,7 @@ Handle<Value> HashTable::Put(const Arguments& args) {
   if(itr != obj->map.end()) {
     Persistent<Value> oldValue = itr->second;
     oldValue.Dispose(); //release the handle to the GC
-  } 
+  }
 
   Persistent<Value> persistent = Persistent<Value>::New(value);
 
@@ -125,15 +126,15 @@ Handle<Value> HashTable::Remove(const Arguments& args) {
   auto itr = obj->map.find(std::string(*keyStr));
 
   if(itr == obj->map.end()) {
-    return scope.Close(Local<Value>()); //do nothing and return undefined
-  } 
+    return scope.Close(Boolean::New(false)); //do nothing and return undefined
+  }
 
   Persistent<Value> value = itr->second;
   value.Dispose();
 
   obj->map.erase(itr);
 
-  return scope.Close(Local<Value>());
+  return scope.Close(Boolean::New(true));
 }
 
 Handle<Value> HashTable::Clear(const Arguments& args) {
@@ -200,4 +201,30 @@ Handle<Value> HashTable::MaxLoadFactor(const Arguments& args) {
 
     return scope.Close(Number::New((double)factor));
   }
+}
+
+Handle<Value> HashTable::ForEach(const Arguments& args) {
+  HandleScope scope;
+
+  HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+  if (!args[0]->IsFunction()) {
+    ThrowException(Exception::TypeError(String::New("Wrong arguments")));
+    return scope.Close(Undefined());
+  }
+
+  Local<Function> cb = Local<Function>::Cast(args[0]);
+  const unsigned argc = 2;
+  Persistent<Value> argv[argc];
+
+  MapType::const_iterator itr = obj->map.begin();
+
+  while (itr != obj->map.end()) {
+    argv[0] = Persistent<Value>::New(String::New(itr->first.c_str()));
+    argv[1] = Persistent<Value>::New(itr->second);
+    cb->Call(Context::GetCurrent()->Global(), argc, argv);
+    itr++;
+  }
+
+  return scope.Close(Local<Value>());
 }

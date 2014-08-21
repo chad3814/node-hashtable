@@ -52,6 +52,9 @@ class HashTable : public node::ObjectWrap {
 
   //hashTable.max_load_factor() or hashTable.max_load_factor(factor)
   static v8::Handle<v8::Value> MaxLoadFactor(const v8::Arguments &args);
+
+  //hashTable.forEach(function (key, value) {...})
+  static v8::Handle<v8::Value> ForEach(const v8::Arguments &args);
 };
 
 #endif
