@@ -1,6 +1,6 @@
 {
     "name": "hashtable",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "Native hashtables for Node.js",
     "main": "./index.js",
     "keywords": [
@@ -10,11 +10,19 @@
         "hashtable",
         "container"
     ],
+    "maintainers": [{
+        "name": "Chad Walker",
+        "email": "chad@chad-cat-lore-eddie.com",
+        "url": "https://github.com/chad3814"
+    }],
     "author": {
         "name": "Isaac Wagner",
         "email": "isaacbwagner@gmail.com"
     },
-    "repository": "https://github.com/isaacbw/node-hashtable.git",
+    "repository": {
+	    "type": "git",
+	    "url": "git://github.com/chad3814/node-hashtable.git"
+    },
     "engines": {
         "node": "*"
     },

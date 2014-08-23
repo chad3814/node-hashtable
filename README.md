@@ -8,7 +8,7 @@ Sometimes you need to store so much data in memory that V8 can get a bit clogged
 To install, simply:
 
     npm install hashtable
-    
+
 "But Isaac, javascript already has hash tables! They're called objects, dummy"
 ---
 
@@ -21,15 +21,15 @@ Everything you might want to do first requires a new HashMap object (which corre
 
     var HashTable = require('hashtable');
     var hashtable = new HashTable();
-    
+
     hashtable.put('key', {value: 'value'});
 
     console.log(hashtable.get('key'));
-    
+
     ...
-    
+
     > { value: 'value' }
-    
+
 And that's it! Note that values can be any javascript type, including objects. The module properly creates and removes references (aka 'handles' if you know something about v8 internals) as needed, so you don't have to worry about any garbage collection funny business. Just use the module like you would any other javascript library.
 
 The hash table implementation is provided by C++11's `unordered_map` class. Currently there is no fallback for older compilers. Pull requests welcome.
@@ -44,7 +44,7 @@ Lookup a value from its key. Will return undefined if the key does not exist.
 
 ### `remove ( key )`
 
-Remove a key/value pair by its key. If the key does not exist, no action will be performed.
+Remove a key/value pair by its key. If the key does not exist, no action will be performed and it will return false. If a pair is removed, then it will return true.
 
 ### `clear ()`
 
@@ -53,6 +53,13 @@ Removes all key/value pairs from the hash table.
 ### `size ()`
 
 Returns the number of key/value pairs in the hash table.
+
+### `forEach ( cb )`
+
+`cb` is an iterator function that will be called with each key/value pair like `cb(value, key)`.
+
+### `keys ()`
+Will return an array of the keys stored in the hashtable.
 
 ### `rehash ( n )`
 
@@ -65,4 +72,3 @@ Gives a hint to the implementation which may cause a rehash to the most appropri
 ### `max_load_factor ()` or `max_load_factor ( factor )`
 
 Either returns or sets the max load factor of the hash table implementation. This value determines when the hash map is rehashed with a new bucket count. By default it is `1.0`. See [unordered_map#max_load_factor](http://www.cplusplus.com/reference/unordered_map/unordered_map/max_load_factor/)
-
