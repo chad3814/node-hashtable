@@ -65,7 +65,7 @@ Handle<Value> HashTable::Get(const Arguments& args) {
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
     Local<Value> key = Local<Value>(args[0]);
-    String::AsciiValue keyStr(key);
+    String::Utf8Value keyStr(key);
 
     MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
 
@@ -91,7 +91,7 @@ Handle<Value> HashTable::Put(const Arguments& args) {
     Local<Value> key = Local<Value>(args[0]);
     Local<Value> value = Local<Value>(args[1]);
 
-    String::AsciiValue keyStr(key);
+    String::Utf8Value keyStr(key);
 
     MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
 
@@ -135,7 +135,7 @@ Handle<Value> HashTable::Remove(const Arguments& args) {
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
     Local<Value> key = Local<Value>(args[0]);
-    String::AsciiValue keyStr(key);
+    String::Utf8Value keyStr(key);
 
     auto itr = obj->map.find(std::string(*keyStr));
 
