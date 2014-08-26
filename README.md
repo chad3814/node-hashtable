@@ -78,17 +78,17 @@ Either returns or sets the max load factor of the hash table implementation. Thi
 You're right anonymous internet user! Just install HashTable like above, but then use like this:
 
     var Map = require('hashtable/es6-map');
-    
+
     var map = new Map();
     map.set('key', {value: 'value'});
     map.set('something', 'else');
-    
+
     console.log('There are', map.size, 'item(s) in the map');
-    
+
     iterator = map.entries();
     while (!iterator.done) {
         console.log(iterator.key, '=', iterator.value);
         iterator.next();
     }
 
-See the official []ES6 Map documentation](http://people.mozilla.org/~jorendorff/es6-draft.html#sec-map-objects)
+See the official [ES6 Map documentation](http://people.mozilla.org/~jorendorff/es6-draft.html#sec-map-objects)
