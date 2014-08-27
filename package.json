@@ -31,10 +31,12 @@
     "license": "MIT",
     "devDependencies": {
         "test-more": "~0.1.1",
-        "runtests": "~0.1.1"
+        "runtests": "~0.1.1",
+        "async": "latest",
+        "es6-map": "latest"
     },
     "scripts": {
         "install": "node-gyp configure build",
-        "test": "runtests test/*.js"
+        "test": "runtests test/hashtable.js test/keys.js"
     }
 }

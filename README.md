@@ -71,7 +71,7 @@ Gives a hint to the implementation which may cause a rehash to the most appropri
 
 Either returns or sets the max load factor of the hash table implementation. This value determines when the hash map is rehashed with a new bucket count. By default it is `1.0`. See [unordered_map#max_load_factor](http://www.cplusplus.com/reference/unordered_map/unordered_map/max_load_factor/)
 
-
+<a name="es6-map"/>
 "But Chad, what if I want a super fast version of ES6's Map? Isn't this really close?"
 ---
 
