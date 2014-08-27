@@ -16,6 +16,7 @@ void HashTable::init(Handle<Object> exports) {
     auto ht_prototype = ht_constructor->PrototypeTemplate();
     ht_prototype->Set("put", FunctionTemplate::New(Put)->GetFunction());
     ht_prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
+    ht_prototype->Set("has", FunctionTemplate::New(Has)->GetFunction());
     ht_prototype->Set("keys", FunctionTemplate::New(Keys)->GetFunction());
     ht_prototype->Set("remove", FunctionTemplate::New(Remove)->GetFunction());
     ht_prototype->Set("clear", FunctionTemplate::New(Clear)->GetFunction());
@@ -28,6 +29,7 @@ void HashTable::init(Handle<Object> exports) {
     auto map_prototype = map_constructor->PrototypeTemplate();
     map_prototype->Set("set", FunctionTemplate::New(Put)->GetFunction());
     map_prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
+    map_prototype->Set("has", FunctionTemplate::New(Has)->GetFunction());
     map_prototype->Set("keys", FunctionTemplate::New(MapKeys)->GetFunction());
     map_prototype->Set("values", FunctionTemplate::New(MapValues)->GetFunction());
     map_prototype->Set("entries", FunctionTemplate::New(MapEntries)->GetFunction());
@@ -92,6 +94,28 @@ Handle<Value> HashTable::Get(const Arguments& args) {
     Persistent<Value> value = itr->second;
 
     return scope.Close(value);
+}
+
+Handle<Value> HashTable::Has(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1 || !args[0]->IsString()) {
+        ThrowException(Exception::TypeError(String::New("Wrong arguments")));
+        return scope.Close(Undefined());
+    }
+
+    HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+    Local<Value> key = Local<Value>(args[0]);
+    String::Utf8Value keyStr(key);
+
+    MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
+
+    if(itr == obj->map.end()) {
+        return scope.Close(Boolean::New(false)); //return undefined
+    }
+
+    return scope.Close(Boolean::New(true));
 }
 
 Handle<Value> HashTable::Put(const Arguments& args) {

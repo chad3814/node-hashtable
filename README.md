@@ -40,6 +40,10 @@ Insert a new key/value pair in the hashmap. The key must be a string, and the va
 
 Lookup a value from its key. Will return undefined if the key does not exist.
 
+### `has ( key )`
+
+Check if key exists. Will return false if the key does not exist; otherwise true.
+
 ### `remove ( key )`
 
 Remove a key/value pair by its key. If the key does not exist, no action will be performed and it will return false. If a pair is removed, then it will return true.

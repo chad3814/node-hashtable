@@ -30,6 +30,9 @@ private:
     // hashTable.get(key) : value
     static v8::Handle<v8::Value> Get(const v8::Arguments &args);
 
+    // hashTable.has(key) : boolean
+    static v8::Handle<v8::Value> Has(const v8::Arguments &args);
+
     // hashTable.put(key, value) : undefined
     static v8::Handle<v8::Value> Put(const v8::Arguments &args);
 
