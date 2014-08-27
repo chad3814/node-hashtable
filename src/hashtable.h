@@ -12,7 +12,7 @@
 #endif
 #include "v8_value_hasher.h"
 
-typedef unordered_map<v8::Persistent<v8::Value>,v8::Persistent<v8::Value> > MapType;
+typedef unordered_map<v8::Persistent<v8::Value>,v8::Persistent<v8::Value>, v8_value_hash, v8_value_equal_to> MapType;
 
 class HashTable : public node::ObjectWrap {
 public:
@@ -28,13 +28,16 @@ private:
     // new HashTable() or new HashTable(buckets)
     static v8::Handle<v8::Value> Constructor(const v8::Arguments &args);
 
+    // new HashMap() or new HashMap(buckets)
+    static v8::Handle<v8::Value> MapConstructor(const v8::Arguments &args);
+
     // hashTable.get(key) : value
     static v8::Handle<v8::Value> Get(const v8::Arguments &args);
 
     // hashTable.has(key) : boolean
     static v8::Handle<v8::Value> Has(const v8::Arguments &args);
 
-    // hashTable.put(key, value) : undefined
+    // hashTable.put(key, value) : hashtable
     static v8::Handle<v8::Value> Put(const v8::Arguments &args);
 
     // hashTable.keys() : []

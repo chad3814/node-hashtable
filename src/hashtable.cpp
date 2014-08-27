@@ -9,7 +9,7 @@ void HashTable::init(Handle<Object> exports) {
     ht_constructor->SetClassName(String::NewSymbol("HashTable"));
     ht_constructor->InstanceTemplate()->SetInternalFieldCount(1);
 
-    Local<FunctionTemplate> map_constructor = FunctionTemplate::New(Constructor);
+    Local<FunctionTemplate> map_constructor = FunctionTemplate::New(MapConstructor);
     map_constructor->SetClassName(String::NewSymbol("NodeMap"));
     map_constructor->InstanceTemplate()->SetInternalFieldCount(1);
 
@@ -72,6 +72,22 @@ Handle<Value> HashTable::Constructor(const Arguments& args) {
     return args.This();
 }
 
+Handle<Value> HashTable::MapConstructor(const Arguments& args) {
+    HashTable *obj;
+
+    if(args.Length() > 0 && args[0]->IsInt32()) {
+        int buckets = args[0]->Int32Value();
+        obj = new HashTable(buckets);
+    } else {
+        obj = new HashTable();
+    }
+
+    args.This()->SetAccessor(String::New("size"), MapSize);
+    obj->Wrap(args.This());
+
+    return args.This();
+}
+
 Handle<Value> HashTable::Get(const Arguments& args) {
     HandleScope scope;
 
@@ -126,8 +142,8 @@ Handle<Value> HashTable::Put(const Arguments& args) {
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Persistent<Value> key = Persistent<Value>(args[0]);
-    Local<Value> value = Local<Value>(args[1]);
+    Persistent<Value> key = Persistent<Value>::New(args[0]);
+    Persistent<Value> value = Persistent<Value>::New(args[1]);
 
     MapType::const_iterator itr = obj->map.find(key);
 
@@ -137,12 +153,10 @@ Handle<Value> HashTable::Put(const Arguments& args) {
         oldValue.Dispose(); //release the handle to the GC
     }
 
-    Persistent<Value> persistent = Persistent<Value>::New(value);
+    obj->map.insert(std::pair<Persistent<Value>, Persistent<Value> >(key, value));
 
-    obj->map.insert(std::pair<Persistent<Value>, Persistent<Value> >(key, persistent));
-
-    //Return undefined
-    return scope.Close(Undefined());
+    //Return this
+    return scope.Close(args.This());
 }
 
 Handle<Value> HashTable::Keys(const Arguments& args) {

@@ -13,8 +13,7 @@
 #endif
 
 
-template<>
-struct hash<v8::Persistent<v8::Value> >
+struct v8_value_hash
 {
     size_t operator()(v8::Persistent<v8::Value> key) const {
         std::string s;
@@ -33,8 +32,7 @@ struct hash<v8::Persistent<v8::Value> >
     }
 };
 
-template<>
-struct std::equal_to<v8::Persistent<v8::Value> >
+struct v8_value_equal_to
 {
     bool operator()(v8::Handle<v8::Value> a, v8::Handle<v8::Value> b) const {
         if (a->Equals(b)) {          /* same as JS == */
@@ -99,7 +97,7 @@ struct std::equal_to<v8::Persistent<v8::Value> >
                 return false;
             }
             for (i = 0; i < length; ++i) {
-                if (!std::equal_to<v8::Persistent<v8::Value> >()(*(new v8::Handle<v8::Value>(*a_arr->CloneElementAt(i))), *(new v8::Handle<v8::Value>(*b_arr->CloneElementAt(i))))) {
+                if (!v8_value_equal_to()(*(new v8::Handle<v8::Value>(*a_arr->CloneElementAt(i))), *(new v8::Handle<v8::Value>(*b_arr->CloneElementAt(i))))) {
                     return false;
                 }
             }
@@ -120,7 +118,7 @@ struct std::equal_to<v8::Persistent<v8::Value> >
             if (!b_obj->Has(*property_name)) {
                 return false;
             }
-            if (!std::equal_to<v8::Persistent<v8::Value> >()(*(new v8::Handle<v8::Value>(*a_obj->Get(*property_name))), *(new v8::Handle<v8::Value>(*b_obj->Get(*property_name))))) {
+            if (!v8_value_equal_to()(*(new v8::Handle<v8::Value>(*a_obj->Get(*property_name))), *(new v8::Handle<v8::Value>(*b_obj->Get(*property_name))))) {
                 return false;
             }
         }
