@@ -75,17 +75,16 @@ Handle<Value> HashTable::Constructor(const Arguments& args) {
 Handle<Value> HashTable::Get(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 1 || !args[0]->IsString()) {
+    if (args.Length() < 1) {
         ThrowException(Exception::TypeError(String::New("Wrong arguments")));
         return scope.Close(Undefined());
     }
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Local<Value> key = Local<Value>(args[0]);
-    String::Utf8Value keyStr(key);
+    Persistent<Value> key = Persistent<Value>(args[0]);
 
-    MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
+    MapType::const_iterator itr = obj->map.find(key);
 
     if(itr == obj->map.end()) {
         return scope.Close(Undefined()); //return undefined
@@ -99,17 +98,16 @@ Handle<Value> HashTable::Get(const Arguments& args) {
 Handle<Value> HashTable::Has(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 1 || !args[0]->IsString()) {
+    if (args.Length() < 1) {
         ThrowException(Exception::TypeError(String::New("Wrong arguments")));
         return scope.Close(Undefined());
     }
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Local<Value> key = Local<Value>(args[0]);
-    String::Utf8Value keyStr(key);
+    Persistent<Value> key = Persistent<Value>(args[0]);
 
-    MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
+    MapType::const_iterator itr = obj->map.find(key);
 
     if(itr == obj->map.end()) {
         return scope.Close(Boolean::New(false)); //return undefined
@@ -121,19 +119,17 @@ Handle<Value> HashTable::Has(const Arguments& args) {
 Handle<Value> HashTable::Put(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 2 || !args[0]->IsString()) {
+    if (args.Length() < 2) {
         ThrowException(Exception::TypeError(String::New("Wrong arguments")));
         return scope.Close(Undefined());
     }
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Local<Value> key = Local<Value>(args[0]);
+    Persistent<Value> key = Persistent<Value>(args[0]);
     Local<Value> value = Local<Value>(args[1]);
 
-    String::Utf8Value keyStr(key);
-
-    MapType::const_iterator itr = obj->map.find(std::string(*keyStr));
+    MapType::const_iterator itr = obj->map.find(key);
 
     //overwriting an existing value
     if(itr != obj->map.end()) {
@@ -143,7 +139,7 @@ Handle<Value> HashTable::Put(const Arguments& args) {
 
     Persistent<Value> persistent = Persistent<Value>::New(value);
 
-    obj->map.insert(std::pair<std::string, Persistent<Value> >(std::string(*keyStr), persistent));
+    obj->map.insert(std::pair<Persistent<Value>, Persistent<Value> >(key, persistent));
 
     //Return undefined
     return scope.Close(Undefined());
@@ -158,7 +154,7 @@ Handle<Value> HashTable::Keys(const Arguments& args) {
 
     int i = 0;
     for(auto itr = obj->map.begin(); itr != obj->map.end(); ++itr, ++i) {
-        array->Set(Integer::New(i), String::New(itr->first.c_str()));
+        array->Set(Integer::New(i), itr->first);
     }
 
     return scope.Close(array);
@@ -198,17 +194,16 @@ Handle<Value> HashTable::MapValues(const Arguments& args) {
 Handle<Value> HashTable::Remove(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 1 || !args[0]->IsString()) {
+    if (args.Length() < 1) {
         ThrowException(Exception::TypeError(String::New("Wrong arguments")));
         return scope.Close(Boolean::New(false));
     }
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Local<Value> key = Local<Value>(args[0]);
-    String::Utf8Value keyStr(key);
+    Persistent<Value> key = Persistent<Value>(args[0]);
 
-    auto itr = obj->map.find(std::string(*keyStr));
+    auto itr = obj->map.find(key);
 
     if(itr == obj->map.end()) {
         return scope.Close(Boolean::New(false)); //do nothing and return false
@@ -317,7 +312,7 @@ Handle<Value> HashTable::ForEach(const Arguments& args) {
     MapType::const_iterator itr = obj->map.begin();
 
     while (itr != obj->map.end()) {
-        argv[0] = Persistent<Value>::New(String::New(itr->first.c_str()));
+        argv[0] = Persistent<Value>::New(itr->first);
         argv[1] = Persistent<Value>::New(itr->second);
         cb->Call(ctx, argc, argv);
         itr++;
@@ -351,7 +346,7 @@ Handle<Value> HashTable::MapForEach(const Arguments& args) {
 
     while (itr != obj->map.end()) {
         argv[0] = Persistent<Value>::New(itr->second);
-        argv[1] = Persistent<Value>::New(String::New(itr->first.c_str()));
+        argv[1] = Persistent<Value>::New(itr->first);
         cb->Call(ctx, argc, argv);
         itr++;
     }

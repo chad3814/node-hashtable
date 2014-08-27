@@ -10,8 +10,9 @@
 #include <unordered_map>
 #define unordered_map std::unordered_map
 #endif
+#include "v8_value_hasher.h"
 
-typedef unordered_map<std::string,v8::Persistent<v8::Value> > MapType;
+typedef unordered_map<v8::Persistent<v8::Value>,v8::Persistent<v8::Value> > MapType;
 
 class HashTable : public node::ObjectWrap {
 public:

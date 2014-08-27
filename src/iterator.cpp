@@ -40,7 +40,7 @@ Handle<Value> PairNodeIterator::GetDone(Local<String> property, const AccessorIn
 Handle<Value> PairNodeIterator::GetKey(Local<String> property, const AccessorInfo &info) {
     PairNodeIterator *obj = ObjectWrap::Unwrap<PairNodeIterator>(info.Holder());
 
-    return String::New(obj->iter->first.c_str());
+    return obj->iter->first;
 }
 
 // iterator.value : value
