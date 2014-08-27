@@ -1,29 +1,45 @@
 #include "hashtable.h"
 #include <iostream>
-#ifndef __APPLE__
-#include <unordered_map>
-#endif
+#include "iterator.h"
 
 using namespace v8;
 
 void HashTable::init(Handle<Object> exports) {
-    Local<FunctionTemplate> constructor = FunctionTemplate::New(Constructor);
-    constructor->SetClassName(String::NewSymbol("HashTable"));
-    constructor->InstanceTemplate()->SetInternalFieldCount(1);
+    Local<FunctionTemplate> ht_constructor = FunctionTemplate::New(Constructor);
+    ht_constructor->SetClassName(String::NewSymbol("HashTable"));
+    ht_constructor->InstanceTemplate()->SetInternalFieldCount(1);
 
-    auto prototype = constructor->PrototypeTemplate();
-    prototype->Set("put", FunctionTemplate::New(Put)->GetFunction());
-    prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
-    prototype->Set("keys", FunctionTemplate::New(Keys)->GetFunction());
-    prototype->Set("remove", FunctionTemplate::New(Remove)->GetFunction());
-    prototype->Set("clear", FunctionTemplate::New(Clear)->GetFunction());
-    prototype->Set("size", FunctionTemplate::New(Size)->GetFunction());
-    prototype->Set("rehash", FunctionTemplate::New(Rehash)->GetFunction());
-    prototype->Set("reserve", FunctionTemplate::New(Reserve)->GetFunction());
-    prototype->Set("max_load_factor", FunctionTemplate::New(MaxLoadFactor)->GetFunction());
-    prototype->Set("forEach", FunctionTemplate::New(ForEach)->GetFunction());
+    Local<FunctionTemplate> map_constructor = FunctionTemplate::New(Constructor);
+    map_constructor->SetClassName(String::NewSymbol("NodeMap"));
+    map_constructor->InstanceTemplate()->SetInternalFieldCount(1);
 
-    exports->Set(String::NewSymbol("HashTable"), Persistent<Function>::New(constructor->GetFunction()));
+    auto ht_prototype = ht_constructor->PrototypeTemplate();
+    ht_prototype->Set("put", FunctionTemplate::New(Put)->GetFunction());
+    ht_prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
+    ht_prototype->Set("keys", FunctionTemplate::New(Keys)->GetFunction());
+    ht_prototype->Set("remove", FunctionTemplate::New(Remove)->GetFunction());
+    ht_prototype->Set("clear", FunctionTemplate::New(Clear)->GetFunction());
+    ht_prototype->Set("size", FunctionTemplate::New(Size)->GetFunction());
+    ht_prototype->Set("rehash", FunctionTemplate::New(Rehash)->GetFunction());
+    ht_prototype->Set("reserve", FunctionTemplate::New(Reserve)->GetFunction());
+    ht_prototype->Set("max_load_factor", FunctionTemplate::New(MaxLoadFactor)->GetFunction());
+    ht_prototype->Set("forEach", FunctionTemplate::New(ForEach)->GetFunction());
+
+    auto map_prototype = map_constructor->PrototypeTemplate();
+    map_prototype->Set("set", FunctionTemplate::New(Put)->GetFunction());
+    map_prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
+    map_prototype->Set("keys", FunctionTemplate::New(MapKeys)->GetFunction());
+    map_prototype->Set("values", FunctionTemplate::New(MapValues)->GetFunction());
+    map_prototype->Set("entries", FunctionTemplate::New(MapEntries)->GetFunction());
+    map_prototype->Set("delete", FunctionTemplate::New(Remove)->GetFunction());
+    map_prototype->Set("clear", FunctionTemplate::New(Clear)->GetFunction());
+    map_prototype->Set("rehash", FunctionTemplate::New(Rehash)->GetFunction());
+    map_prototype->Set("reserve", FunctionTemplate::New(Reserve)->GetFunction());
+    map_prototype->Set("max_load_factor", FunctionTemplate::New(MaxLoadFactor)->GetFunction());
+    map_prototype->Set("forEach", FunctionTemplate::New(MapForEach)->GetFunction());
+
+    exports->Set(String::NewSymbol("HashTable"), Persistent<Function>::New(ht_constructor->GetFunction()));
+    exports->Set(String::NewSymbol("NodeMap"), Persistent<Function>::New(map_constructor->GetFunction()));
 }
 
 HashTable::HashTable() {}
@@ -124,6 +140,37 @@ Handle<Value> HashTable::Keys(const Arguments& args) {
     return scope.Close(array);
 }
 
+Handle<Value> HashTable::MapEntries(const Arguments& args) {
+    HandleScope scope;
+
+    HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+    Local<Object> iter = PairNodeIterator::init(PairNodeIterator::KEY_TYPE | PairNodeIterator::VALUE_TYPE, obj->map.begin(), obj->map.end());
+
+    return scope.Close(iter);
+}
+
+Handle<Value> HashTable::MapKeys(const Arguments& args) {
+    HandleScope scope;
+
+    HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+    Local<Object> iter = PairNodeIterator::init(PairNodeIterator::KEY_TYPE, obj->map.begin(), obj->map.end());
+
+    return scope.Close(iter);
+}
+
+Handle<Value> HashTable::MapValues(const Arguments& args) {
+    HandleScope scope;
+
+    HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+    Local<Object> iter = PairNodeIterator::init(PairNodeIterator::VALUE_TYPE, obj->map.begin(), obj->map.end());
+
+    return scope.Close(iter);
+}
+
+
 Handle<Value> HashTable::Remove(const Arguments& args) {
     HandleScope scope;
 
@@ -172,6 +219,12 @@ Handle<Value> HashTable::Size(const Arguments& args) {
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
     return scope.Close(Integer::New(obj->map.size()));
+}
+
+Handle<Value> HashTable::MapSize(Local<String> property, const AccessorInfo &info) {
+    HashTable *obj = ObjectWrap::Unwrap<HashTable>(info.Holder());
+
+    return Integer::New(obj->map.size());
 }
 
 Handle<Value> HashTable::Rehash(const Arguments& args) {
@@ -242,6 +295,39 @@ Handle<Value> HashTable::ForEach(const Arguments& args) {
     while (itr != obj->map.end()) {
         argv[0] = Persistent<Value>::New(String::New(itr->first.c_str()));
         argv[1] = Persistent<Value>::New(itr->second);
+        cb->Call(ctx, argc, argv);
+        itr++;
+    }
+
+    return scope.Close(Undefined());
+}
+
+Handle<Value> HashTable::MapForEach(const Arguments& args) {
+    HandleScope scope;
+
+    HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
+
+    if (args.Length() < 1 || !args[0]->IsFunction()) {
+        ThrowException(Exception::TypeError(String::New("Wrong arguments")));
+        return scope.Close(Undefined());
+    }
+    Local<Function> cb = Local<Function>::Cast(args[0]);
+
+    Handle<Object> ctx;
+    if (args.Length() > 1 && args[1]->IsObject()) {
+        ctx = args[1]->ToObject();
+    } else {
+        ctx = Context::GetCurrent()->Global();
+    }
+
+    const unsigned argc = 2;
+    Persistent<Value> argv[argc];
+
+    MapType::const_iterator itr = obj->map.begin();
+
+    while (itr != obj->map.end()) {
+        argv[0] = Persistent<Value>::New(itr->second);
+        argv[1] = Persistent<Value>::New(String::New(itr->first.c_str()));
         cb->Call(ctx, argc, argv);
         itr++;
     }

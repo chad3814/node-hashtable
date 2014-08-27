@@ -36,6 +36,18 @@ private:
     // hashTable.keys() : []
     static v8::Handle<v8::Value> Keys(const v8::Arguments &args);
 
+    // map.entries() : iterator
+    static v8::Handle<v8::Value> MapEntries(const v8::Arguments &args);
+
+    // map.keys() : iterator
+    static v8::Handle<v8::Value> MapKeys(const v8::Arguments &args);
+
+    // map.values() : iterator
+    static v8::Handle<v8::Value> MapValues(const v8::Arguments &args);
+
+    // map.size : number of elements
+    static v8::Handle<v8::Value> MapSize(v8::Local<v8::String> property, const v8::AccessorInfo &info);
+
     // hashTable.remove(key) : boolean
     static v8::Handle<v8::Value> Remove(const v8::Arguments &args);
 
@@ -56,6 +68,9 @@ private:
 
     // hashTable.forEach(function (key, value) {...}, context) : undefined
     static v8::Handle<v8::Value> ForEach(const v8::Arguments &args);
+
+    // hashTable.forEach(function (key, value) {...}, context) : undefined
+    static v8::Handle<v8::Value> MapForEach(const v8::Arguments &args);
 };
 
 #endif
