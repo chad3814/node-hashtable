@@ -40,12 +40,20 @@ Handle<Value> PairNodeIterator::GetDone(Local<String> property, const AccessorIn
 Handle<Value> PairNodeIterator::GetKey(Local<String> property, const AccessorInfo &info) {
     PairNodeIterator *obj = ObjectWrap::Unwrap<PairNodeIterator>(info.Holder());
 
+    if (obj->iter == obj->end) {
+        return Undefined();
+    }
+
     return obj->iter->first;
 }
 
 // iterator.value : value
 Handle<Value> PairNodeIterator::GetValue(Local<String> property, const AccessorInfo &info) {
     PairNodeIterator *obj = ObjectWrap::Unwrap<PairNodeIterator>(info.Holder());
+
+    if (obj->iter == obj->end) {
+        return Undefined();
+    }
 
     return obj->iter->second;
 }
@@ -55,6 +63,10 @@ v8::Handle<v8::Value> PairNodeIterator::Next(const v8::Arguments &args) {
     HandleScope scope;
 
     PairNodeIterator *obj = ObjectWrap::Unwrap<PairNodeIterator >(args.This());
+
+    if (obj->iter == obj->end) {
+        return scope.Close(Undefined());
+    }
 
     obj->iter++;
 
