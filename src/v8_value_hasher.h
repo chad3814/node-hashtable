@@ -18,13 +18,13 @@ struct v8_value_hash
     size_t operator()(v8::Persistent<v8::Value> key) const {
         std::string s;
         if (key->IsString() || key->IsBoolean() || key->IsDate() || key->IsRegExp() || key->IsStringObject() || key->IsNumberObject() || key->IsBooleanObject()) {
-            s = *v8::String::AsciiValue(key->ToString());
+            s = *v8::String::Utf8Value(key->ToString());
         } else {
             v8::Handle<v8::Context> context = v8::Context::GetCurrent();
             v8::Handle<v8::Object> global = context->Global();
             v8::Handle<v8::Object> JSON = global->Get(v8::String::New("JSON"))->ToObject();
             v8::Handle<v8::Function> stringify = v8::Handle<v8::Function>::Cast(JSON->Get(v8::String::New("stringify")));
-            s = *v8::String::AsciiValue(stringify->Call(JSON, 1, new v8::Handle<v8::Value>(key)));
+            s = *v8::String::Utf8Value(stringify->Call(JSON, 1, new v8::Handle<v8::Value>(key)));
         }
         //std::cout << "hasher key " << s << '\n';
 
