@@ -65,10 +65,10 @@ v8::Handle<v8::Value> PairNodeIterator::Next(const v8::Arguments &args) {
     PairNodeIterator *obj = ObjectWrap::Unwrap<PairNodeIterator >(args.This());
 
     if (obj->iter == obj->end) {
-        return scope.Close(Undefined());
+        return scope.Close(args.This());
     }
 
     obj->iter++;
 
-    return scope.Close(Undefined());
+    return scope.Close(args.This());
 }
