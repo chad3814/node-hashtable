@@ -142,8 +142,11 @@ Handle<Value> HashTable::Put(const Arguments& args) {
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Persistent<Value> key = Persistent<Value>::New(args[0]);
-    Persistent<Value> value = Persistent<Value>::New(args[1]);
+    Local<Value> localk = Local<Value>::New(args[0]);
+    Local<Value> localv = Local<Value>::New(args[1]);
+
+    Persistent<Value> key = Persistent<Value>::New(localk);
+    Persistent<Value> value = Persistent<Value>::New(localv);
 
     MapType::const_iterator itr = obj->map.find(key);
 
