@@ -13,7 +13,7 @@ void HashTable::init(Handle<Object> exports) {
     map_constructor->SetClassName(String::NewSymbol("NodeMap"));
     map_constructor->InstanceTemplate()->SetInternalFieldCount(1);
 
-    auto ht_prototype = ht_constructor->PrototypeTemplate();
+    Local<ObjectTemplate> ht_prototype = ht_constructor->PrototypeTemplate();
     ht_prototype->Set("put", FunctionTemplate::New(Put)->GetFunction());
     ht_prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
     ht_prototype->Set("has", FunctionTemplate::New(Has)->GetFunction());
@@ -26,7 +26,7 @@ void HashTable::init(Handle<Object> exports) {
     ht_prototype->Set("max_load_factor", FunctionTemplate::New(MaxLoadFactor)->GetFunction());
     ht_prototype->Set("forEach", FunctionTemplate::New(ForEach)->GetFunction());
 
-    auto map_prototype = map_constructor->PrototypeTemplate();
+    Local<ObjectTemplate> map_prototype = map_constructor->PrototypeTemplate();
     map_prototype->Set("set", FunctionTemplate::New(Put)->GetFunction());
     map_prototype->Set("get", FunctionTemplate::New(Get)->GetFunction());
     map_prototype->Set("has", FunctionTemplate::New(Has)->GetFunction());
@@ -42,6 +42,8 @@ void HashTable::init(Handle<Object> exports) {
 
     exports->Set(String::NewSymbol("HashTable"), Persistent<Function>::New(ht_constructor->GetFunction()));
     exports->Set(String::NewSymbol("NodeMap"), Persistent<Function>::New(map_constructor->GetFunction()));
+
+    PairNodeIterator::init();
 }
 
 HashTable::HashTable() {}
@@ -49,7 +51,7 @@ HashTable::HashTable() {}
 HashTable::HashTable(size_t buckets) : map(buckets) {}
 
 HashTable::~HashTable() {
-    for(auto itr = this->map.begin(); itr != this->map.end(); ) {
+    for(MapType::const_iterator itr = this->map.begin(); itr != this->map.end(); ) {
         Persistent<Value> value = itr->second;
         value.Dispose();
 
@@ -167,7 +169,7 @@ Handle<Value> HashTable::Keys(const Arguments& args) {
     Local<Array> array = Array::New();
 
     int i = 0;
-    for(auto itr = obj->map.begin(); itr != obj->map.end(); ++itr, ++i) {
+    for(MapType::const_iterator itr = obj->map.begin(); itr != obj->map.end(); ++itr, ++i) {
         array->Set(Integer::New(i), itr->first);
     }
 
@@ -179,7 +181,7 @@ Handle<Value> HashTable::MapEntries(const Arguments& args) {
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Local<Object> iter = PairNodeIterator::init(PairNodeIterator::KEY_TYPE | PairNodeIterator::VALUE_TYPE, obj->map.begin(), obj->map.end());
+    Local<Object> iter = PairNodeIterator::New(PairNodeIterator::KEY_TYPE | PairNodeIterator::VALUE_TYPE, obj->map.begin(), obj->map.end());
 
     return scope.Close(iter);
 }
@@ -189,7 +191,7 @@ Handle<Value> HashTable::MapKeys(const Arguments& args) {
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Local<Object> iter = PairNodeIterator::init(PairNodeIterator::KEY_TYPE, obj->map.begin(), obj->map.end());
+    Local<Object> iter = PairNodeIterator::New(PairNodeIterator::KEY_TYPE, obj->map.begin(), obj->map.end());
 
     return scope.Close(iter);
 }
@@ -199,7 +201,7 @@ Handle<Value> HashTable::MapValues(const Arguments& args) {
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    Local<Object> iter = PairNodeIterator::init(PairNodeIterator::VALUE_TYPE, obj->map.begin(), obj->map.end());
+    Local<Object> iter = PairNodeIterator::New(PairNodeIterator::VALUE_TYPE, obj->map.begin(), obj->map.end());
 
     return scope.Close(iter);
 }
@@ -217,7 +219,7 @@ Handle<Value> HashTable::Remove(const Arguments& args) {
 
     Persistent<Value> key = Persistent<Value>(args[0]);
 
-    auto itr = obj->map.find(key);
+    MapType::const_iterator itr = obj->map.find(key);
 
     if(itr == obj->map.end()) {
         return scope.Close(Boolean::New(false)); //do nothing and return false
@@ -236,7 +238,7 @@ Handle<Value> HashTable::Clear(const Arguments& args) {
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
-    for(auto itr = obj->map.begin(); itr != obj->map.end(); ) {
+    for(MapType::const_iterator itr = obj->map.begin(); itr != obj->map.end(); ) {
         Persistent<Value> value = itr->second;
         value.Dispose();
 

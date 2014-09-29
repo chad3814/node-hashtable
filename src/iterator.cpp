@@ -2,30 +2,63 @@
 #include <iostream>
 
 using namespace v8;
+static Persistent<FunctionTemplate> key_value_tmplt;
+static Persistent<FunctionTemplate> key_tmplt;
+static Persistent<FunctionTemplate> value_tmplt;
 
-Local<Object> PairNodeIterator::init(int type, MapType::iterator new_iter, MapType::iterator new_end) {
-    Local<ObjectTemplate> tmplt = ObjectTemplate::New();
-    tmplt->SetInternalFieldCount(1);
+void PairNodeIterator::init() {
+    key_value_tmplt = Persistent<FunctionTemplate>::New(FunctionTemplate::New());
+    key_tmplt = Persistent<FunctionTemplate>::New(FunctionTemplate::New());
+    value_tmplt = Persistent<FunctionTemplate>::New(FunctionTemplate::New());
 
-    PairNodeIterator *iter = new PairNodeIterator(new_iter, new_end);
+    Handle<ObjectTemplate> key_value_obj_tmplt = key_value_tmplt->InstanceTemplate();
+    Handle<ObjectTemplate> key_obj_tmplt = key_tmplt->InstanceTemplate();
+    Handle<ObjectTemplate> value_obj_tmplt = value_tmplt->InstanceTemplate();
 
-    if (PairNodeIterator::KEY_TYPE & type) {
-        tmplt->SetAccessor(String::New("key"), GetKey);
-    }
+    key_value_obj_tmplt->SetInternalFieldCount(1);
+    key_obj_tmplt->SetInternalFieldCount(1);
+    value_obj_tmplt->SetInternalFieldCount(1);
 
-    if (PairNodeIterator::VALUE_TYPE & type) {
-        tmplt->SetAccessor(String::New("value"), GetValue);
-    }
+    key_value_obj_tmplt->SetAccessor(String::New("key"), GetKey);
+    key_obj_tmplt->SetAccessor(String::New("key"), GetKey);
 
-    tmplt->SetAccessor(String::New("done"), GetDone);
-    tmplt->Set(String::New("next"), FunctionTemplate::New(Next)->GetFunction());
-    Local<Object> obj = tmplt->NewInstance();
+    key_value_obj_tmplt->SetAccessor(String::New("value"), GetValue);
+    value_obj_tmplt->SetAccessor(String::New("value"), GetValue);
 
-    iter->Wrap(obj);
-    return obj;
+    key_value_obj_tmplt->SetAccessor(String::New("done"), GetDone);
+    key_obj_tmplt->SetAccessor(String::New("done"), GetDone);
+    value_obj_tmplt->SetAccessor(String::New("done"), GetDone);
+
+    Local<ObjectTemplate> key_value_prototype = key_value_tmplt->PrototypeTemplate();
+    Local<ObjectTemplate> key_prototype = key_tmplt->PrototypeTemplate();
+    Local<ObjectTemplate> value_prototype = value_tmplt->PrototypeTemplate();
+
+    key_value_prototype->Set(String::New("next"), FunctionTemplate::New(Next)->GetFunction());
+    key_prototype->Set(String::New("next"), FunctionTemplate::New(Next)->GetFunction());
+    value_prototype->Set(String::New("next"), FunctionTemplate::New(Next)->GetFunction());
 }
 
-PairNodeIterator::PairNodeIterator(MapType::iterator new_iter, MapType::iterator new_end) : iter(new_iter), end(new_end) {}
+Local<Object> PairNodeIterator::New(int type, MapType::const_iterator new_iter, MapType::const_iterator new_end) {
+    HandleScope scope;
+
+    Handle<FunctionTemplate> tmplt;
+    if ((PairNodeIterator::KEY_TYPE & type) && (PairNodeIterator::VALUE_TYPE & type)) {
+        tmplt = key_value_tmplt;
+    } else if (KEY_TYPE & type) {
+        tmplt = key_tmplt;
+    } else {
+        tmplt = value_tmplt;
+    }
+
+    Local<Object> obj = tmplt->InstanceTemplate()->NewInstance();
+    PairNodeIterator *iter = new PairNodeIterator(new_iter, new_end);
+
+    iter->Wrap(obj);
+
+    return scope.Close(obj);
+}
+
+PairNodeIterator::PairNodeIterator(MapType::const_iterator new_iter, MapType::const_iterator new_end) : iter(new_iter), end(new_end) {}
 
 
 // iterator.done : boolean

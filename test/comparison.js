@@ -161,17 +161,23 @@ var tests = [
     ['raw insert and remove 50000', rawInsertAndRemove.bind(null, 50000)],
     ['raw insert and find 10000', rawInsertAndFind.bind(null, 10000)],
     ['raw insert and find 20000', rawInsertAndFind.bind(null, 20000)],
-    ['raw insert and find 50000', rawInsertAndFind.bind(null, 50000)],
+    ['raw insert and find 50000', rawInsertAndFind.bind(null, 50000)]
+];
 
-    ['ES6 insert 10000', es6Insert.bind(null, 10000)],
-    ['ES6 insert 20000', es6Insert.bind(null, 20000)],
-    ['ES6 insert 50000', es6Insert.bind(null, 50000)],
-    ['ES6 insert and remove 10000', es6InsertAndRemove.bind(null, 10000)],
-    ['ES6 insert and remove 50000', es6InsertAndRemove.bind(null, 50000)],
-    ['ES6 insert and find 10000', es6InsertAndFind.bind(null, 10000)],
-    ['ES6 insert and find 20000', es6InsertAndFind.bind(null, 20000)],
-    ['ES6 insert and find 50000', es6InsertAndFind.bind(null, 50000)],
+if (process.argv.length < 3 || process.argv[2] !== '--no-es6') {
+    tests.push(
+        ['ES6 insert 10000', es6Insert.bind(null, 10000)],
+        ['ES6 insert 20000', es6Insert.bind(null, 20000)],
+        ['ES6 insert 50000', es6Insert.bind(null, 50000)],
+        ['ES6 insert and remove 10000', es6InsertAndRemove.bind(null, 10000)],
+        ['ES6 insert and remove 50000', es6InsertAndRemove.bind(null, 50000)],
+        ['ES6 insert and find 10000', es6InsertAndFind.bind(null, 10000)],
+        ['ES6 insert and find 20000', es6InsertAndFind.bind(null, 20000)],
+        ['ES6 insert and find 50000', es6InsertAndFind.bind(null, 50000)]
+    );
+}
 
+tests.push(
     ['HashMap insert 10000', hashInsert.bind(null, 10000)],
     ['HashMap insert 20000', hashInsert.bind(null, 20000)],
     ['HashMap insert 50000', hashInsert.bind(null, 50000)],
@@ -180,7 +186,7 @@ var tests = [
     ['HashMap insert and find 10000', hashInsertAndFind.bind(null, 10000)],
     ['HashMap insert and find 20000', hashInsertAndFind.bind(null, 20000)],
     ['HashMap insert and find 50000', hashInsertAndFind.bind(null, 50000)]
-];
+);
 
 async.mapSeries(tests, function (params, cb) {
     return process.stdout.write('running ' + params[0] + ' tests', 'utf8', function () {
