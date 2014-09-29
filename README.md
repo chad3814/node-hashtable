@@ -96,3 +96,5 @@ You're right anonymous internet user! Just install HashTable like above, but the
     }
 
 See the official [ES6 Map documentation](http://people.mozilla.org/~jorendorff/es6-draft.html#sec-map-objects)
+
+This package is made possible because of [Grokker](http://grokker.com/), one of the best places to work. If you are a JS developer looking for a new gig, send me an email at &#x5b;'chad', String.fromCharCode(64), 'grokker', String.fromCharCode(0x2e), 'com'&#x5d;.join('').
