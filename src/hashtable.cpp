@@ -128,10 +128,10 @@ Handle<Value> HashTable::Has(const Arguments& args) {
     MapType::const_iterator itr = obj->map.find(key);
 
     if(itr == obj->map.end()) {
-        return scope.Close(Boolean::New(false)); //return undefined
+        return scope.Close(False()); //return undefined
     }
 
-    return scope.Close(Boolean::New(true));
+    return scope.Close(True());
 }
 
 Handle<Value> HashTable::Put(const Arguments& args) {
@@ -153,6 +153,7 @@ Handle<Value> HashTable::Put(const Arguments& args) {
     if(itr != obj->map.end()) {
         Persistent<Value> oldValue = itr->second;
         oldValue.Dispose(); //release the handle to the GC
+        oldValue.Clear();
     }
 
     obj->map.insert(std::pair<Persistent<Value>, Persistent<Value> >(key, value));
@@ -212,7 +213,7 @@ Handle<Value> HashTable::Remove(const Arguments& args) {
 
     if (args.Length() < 1) {
         ThrowException(Exception::TypeError(String::New("Wrong arguments")));
-        return scope.Close(Boolean::New(false));
+        return scope.Close(False());
     }
 
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
@@ -222,15 +223,20 @@ Handle<Value> HashTable::Remove(const Arguments& args) {
     MapType::const_iterator itr = obj->map.find(key);
 
     if(itr == obj->map.end()) {
-        return scope.Close(Boolean::New(false)); //do nothing and return false
+        return scope.Close(False()); //do nothing and return false
     }
+
+    Persistent<Value> stored_key = itr->first;
+    stored_key.Dispose();
+    stored_key.Clear();
 
     Persistent<Value> value = itr->second;
     value.Dispose();
+    value.Clear();
 
     obj->map.erase(itr);
 
-    return scope.Close(Boolean::New(true));
+    return scope.Close(True());
 }
 
 Handle<Value> HashTable::Clear(const Arguments& args) {
@@ -239,8 +245,13 @@ Handle<Value> HashTable::Clear(const Arguments& args) {
     HashTable *obj = ObjectWrap::Unwrap<HashTable>(args.This());
 
     for(MapType::const_iterator itr = obj->map.begin(); itr != obj->map.end(); ) {
+        Persistent<Value> key = itr->first;
+        key.Dispose();
+        key.Clear();
+
         Persistent<Value> value = itr->second;
         value.Dispose();
+        value.Clear();
 
         itr = obj->map.erase(itr);
     }
@@ -315,7 +326,7 @@ Handle<Value> HashTable::ForEach(const Arguments& args) {
     }
     Local<Function> cb = Local<Function>::Cast(args[0]);
 
-    Handle<Object> ctx;
+    Local<Object> ctx;
     if (args.Length() > 1 && args[1]->IsObject()) {
         ctx = args[1]->ToObject();
     } else {
@@ -328,8 +339,8 @@ Handle<Value> HashTable::ForEach(const Arguments& args) {
     MapType::const_iterator itr = obj->map.begin();
 
     while (itr != obj->map.end()) {
-        argv[0] = Persistent<Value>::New(itr->first);
-        argv[1] = Persistent<Value>::New(itr->second);
+        argv[0] = itr->first;
+        argv[1] = itr->second;
         cb->Call(ctx, argc, argv);
         itr++;
     }
@@ -348,7 +359,7 @@ Handle<Value> HashTable::MapForEach(const Arguments& args) {
     }
     Local<Function> cb = Local<Function>::Cast(args[0]);
 
-    Handle<Object> ctx;
+    Local<Object> ctx;
     if (args.Length() > 1 && args[1]->IsObject()) {
         ctx = args[1]->ToObject();
     } else {
@@ -361,8 +372,8 @@ Handle<Value> HashTable::MapForEach(const Arguments& args) {
     MapType::const_iterator itr = obj->map.begin();
 
     while (itr != obj->map.end()) {
-        argv[0] = Persistent<Value>::New(itr->second);
-        argv[1] = Persistent<Value>::New(itr->first);
+        argv[0] = itr->second;
+        argv[1] = itr->first;
         cb->Call(ctx, argc, argv);
         itr++;
     }
