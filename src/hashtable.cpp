@@ -151,9 +151,15 @@ Handle<Value> HashTable::Put(const Arguments& args) {
 
     //overwriting an existing value
     if(itr != obj->map.end()) {
+        Persistent<Value> oldKey = itr->first;
+        oldKey.Dispose();
+        oldKey.Clear();
+
         Persistent<Value> oldValue = itr->second;
         oldValue.Dispose(); //release the handle to the GC
         oldValue.Clear();
+
+        obj->map.erase(itr);
     }
 
     obj->map.insert(std::pair<Persistent<Value>, Persistent<Value> >(key, value));
