@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <node.h>
+#include <nan.h>
 #ifdef __APPLE__
 #include <tr1/unordered_set>
 #define hash std::tr1::hash
@@ -12,35 +13,67 @@
 #define hash std::hash
 #endif
 
+// Node 0.11+ and io.js
+class V8PersistentValueWrapper {
+public:
+    V8PersistentValueWrapper(v8::Isolate *isolate, v8::Local<v8::Value> value) : _isolate(isolate), _value(isolate, value) {}
+
+    ~V8PersistentValueWrapper() {
+        Dispose();
+    }
+
+    V8PersistentValueWrapper(V8PersistentValueWrapper const& other) {
+        _value = other._value;
+        _isolate = other._isolate;
+    }
+
+    V8PersistentValueWrapper& operator=(V8PersistentValueWrapper const& other) {
+        if (this == &other) {
+            return *this;
+        }
+        _value = other._value;
+        _isolate = other._isolate;
+        return *this;
+    }
+
+    v8::Local<v8::Value> Extract() {
+        v8::EscapableHandleScope scope(_isolate);
+        return scope.Escape(v8::Local<v8::Value>::New(_isolate, _value));
+    }
+
+    void Dispose() {
+        _isolate = NULL;
+        _value.Reset();
+    }
+
+private:
+
+    v8::Isolate *_isolate;
+    v8::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value> > _value;
+};
+
 
 struct v8_value_hash
 {
-    size_t operator()(v8::Persistent<v8::Value> key) const {
+    size_t operator()(V8PersistentValueWrapper *pkey) const {
+        v8::Local<v8::Value> key = pkey->Extract();
         std::string s;
-        if (key->IsString() || key->IsBoolean() || key->IsDate() || key->IsRegExp() || key->IsStringObject() || key->IsNumberObject() || key->IsBooleanObject()) {
-            s = *v8::String::AsciiValue(key->ToString());
-        } else {
-            v8::Handle<v8::Context> context = v8::Context::GetCurrent();
-            v8::Handle<v8::Object> global = context->Global();
-            v8::Handle<v8::Object> JSON = global->Get(v8::String::New("JSON"))->ToObject();
-            v8::Handle<v8::Function> stringify = v8::Handle<v8::Function>::Cast(JSON->Get(v8::String::New("stringify")));
-            s = *v8::String::AsciiValue(stringify->Call(JSON, 1, new v8::Handle<v8::Value>(key)));
+        if (key->IsString() || key->IsBoolean() || key->IsNumber()) {
+            return hash<std::string>()(*NanUtf8String(key->ToString()));
         }
-        //std::cout << "hasher key " << s << '\n';
-
-        return hash<std::string>()(s);
+        return hash<int>()(key.As<v8::Object>()->GetIdentityHash());
     }
 };
 
 struct v8_value_equal_to
 {
-    bool operator()(v8::Handle<v8::Value> a, v8::Handle<v8::Value> b) const {
+    bool operator()(V8PersistentValueWrapper *pa, V8PersistentValueWrapper *pb) const {
+        v8::Local<v8::Value> a = pa->Extract();
+        v8::Local<v8::Value> b = pb->Extract();
+
         if (a->Equals(b)) {          /* same as JS == */
             return true;
         }
-
-        uint32_t length;
-        uint32_t i;
 
         /* try basic types, if it is one, then can't be equal */
         if (a->IsString() || b->IsString()) {
@@ -53,76 +86,8 @@ struct v8_value_equal_to
             return false;
         }
 
-        /* try complex types that need a deeper equality */
-        if (a->IsDate()) {
-            if (!b->IsDate()) {
-                return false;
-            }
-            return a->NumberValue() == b->NumberValue();
-        }
-        if (a->IsRegExp()) {
-            if (!b->IsRegExp()) {
-                return false;
-            }
-            v8::RegExp *a_reg = v8::RegExp::Cast(*a);
-            v8::RegExp *b_reg = v8::RegExp::Cast(*b);
-            return (a_reg->GetFlags() == b_reg->GetFlags()) && a_reg->GetSource()->Equals(b_reg->GetSource());
-        }
-        if (a->IsBooleanObject()) {
-            if (!b->IsBooleanObject()) {
-                return false;
-            }
-            return a->BooleanValue() == b->BooleanValue();
-        }
-        if (a->IsNumberObject()) {
-            if (!b->IsNumberObject()) {
-                return false;
-            }
-            return a->NumberValue() == b->NumberValue();
-        }
-        if (a->IsStringObject()) {
-            if (!b->IsStringObject()) {
-                return false;
-            }
-            return v8::String::Cast(*a)->Equals(*(new v8::Handle<v8::String>(v8::String::Cast(*b))));
-        }
-        if (a->IsArray()) {
-            if (!b->IsArray()) {
-                return false;
-            }
-            v8::Array *a_arr = v8::Array::Cast(*a);
-            v8::Array *b_arr = v8::Array::Cast(*b);
-            length = a_arr->Length();
-            if (length != b_arr->Length()) {
-                return false;
-            }
-            for (i = 0; i < length; ++i) {
-                if (!v8_value_equal_to()(*(new v8::Handle<v8::Value>(*a_arr->CloneElementAt(i))), *(new v8::Handle<v8::Value>(*b_arr->CloneElementAt(i))))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /* generic Object deep equals, but only own properties, not prototype properties */
-        v8::Object *a_obj = v8::Object::Cast(*a);
-        v8::Object *b_obj = v8::Object::Cast(*b);
-        v8::Local<v8::Array> properties = a_obj->GetOwnPropertyNames();
-        v8::Local<v8::String> *property_name;
-        length = properties->Length();
-        if (length != b_obj->GetOwnPropertyNames()->Length()) {
-            return false;
-        }
-        for (i = 0; i < length; ++i) {
-            property_name = new v8::Local<v8::String>(v8::String::Cast(*properties->Get(i)));
-            if (!b_obj->Has(*property_name)) {
-                return false;
-            }
-            if (!v8_value_equal_to()(*(new v8::Handle<v8::Value>(*a_obj->Get(*property_name))), *(new v8::Handle<v8::Value>(*b_obj->Get(*property_name))))) {
-                return false;
-            }
-        }
-        return true;
+        // if the identity hashes are equal, then it's equal
+        return a.As<v8::Object>()->GetIdentityHash() == b.As<v8::Object>()->GetIdentityHash();
     }
 };
 

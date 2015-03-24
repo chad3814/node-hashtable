@@ -15,6 +15,8 @@ V8 is great, but was never really meant for driving large software systems. Try 
 Usage
 -----
 
+*Update*: As of version 1.0.0, this module will no longer work on Node 0.10 or earlier. If this is a problem use 0.x.x.
+
 Everything you might want to do first requires a new HashMap object (which corresponds to a native c++ unordered_map):
 
     var HashTable = require('hashtable');
