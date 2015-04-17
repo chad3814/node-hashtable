@@ -1,6 +1,6 @@
 {
     "name": "hashtable",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Native HashTable and ES6 compatible Map for Node.js",
     "main": "./index.js",
     "keywords": [

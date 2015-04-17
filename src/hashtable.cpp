@@ -102,7 +102,7 @@ NAN_METHOD(HashTable::MapConstructor) {
 NAN_METHOD(HashTable::Get) {
     NanScope();
 
-    if (args.Length() < 1) {
+    if (args.Length() < 1 || args[0]->IsUndefined() || args[0]->IsNull()) {
         NanThrowTypeError("Wrong arguments");
         NanReturnUndefined();
     }
@@ -122,7 +122,7 @@ NAN_METHOD(HashTable::Get) {
 NAN_METHOD(HashTable::Has) {
     NanScope();
 
-    if (args.Length() < 1) {
+    if (args.Length() < 1 || args[0]->IsUndefined() || args[0]->IsNull()) {
         NanThrowTypeError("Wrong arguments");
         NanReturnUndefined();
     }
@@ -142,7 +142,7 @@ NAN_METHOD(HashTable::Has) {
 NAN_METHOD(HashTable::Put) {
     NanScope();
 
-    if (args.Length() < 2) {
+    if (args.Length() < 2 || args[0]->IsUndefined() || args[0]->IsNull()) {
         NanThrowTypeError("Wrong arguments");
         NanReturnUndefined();
     }
