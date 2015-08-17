@@ -111,11 +111,12 @@ NAN_METHOD(HashTable::Get) {
     V8PersistentValueWrapper *persistent = new V8PersistentValueWrapper(Isolate::GetCurrent(), args[0]);
 
     MapType::const_iterator itr = obj->map.find(persistent);
-
+	
     if(itr == obj->map.end()) {
+		delete persistent;
         NanReturnUndefined();
     }
-
+	delete persistent;
     NanReturnValue(itr->second->Extract());
 }
 
@@ -133,9 +134,10 @@ NAN_METHOD(HashTable::Has) {
     MapType::const_iterator itr = obj->map.find(persistent);
 
     if(itr == obj->map.end()) {
+		delete persistent;
         NanReturnValue(NanFalse());
     }
-
+	delete persistent;
     NanReturnValue(NanTrue());
 }
 
