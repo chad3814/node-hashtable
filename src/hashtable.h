@@ -2,6 +2,7 @@
 #define HASHTABLE_H
 
 #include <string>
+#include <iostream>
 #ifdef __APPLE__
 #include <tr1/unordered_map>
 #define unordered_map std::tr1::unordered_map
@@ -13,11 +14,11 @@
 #include <nan.h>
 #include "v8_value_hasher.h"
 
-typedef unordered_map<V8PersistentValueWrapper *,V8PersistentValueWrapper *, v8_value_hash, v8_value_equal_to> MapType;
+typedef unordered_map<CopyablePersistent *, CopyablePersistent *, v8_value_hash> MapType;
 
-class HashTable : public node::ObjectWrap {
+class HashTable : public Nan::ObjectWrap {
 public:
-    static void init(v8::Handle<v8::Object> exports);
+    static void init(v8::Local<v8::Object> target);
 
 private:
     HashTable();
@@ -28,9 +29,6 @@ private:
 
     // new HashTable() or new HashTable(buckets)
     static NAN_METHOD(Constructor);
-
-    // new HashMap() or new HashMap(buckets)
-    static NAN_METHOD(MapConstructor);
 
     // hashTable.get(key) : value
     static NAN_METHOD(Get);
@@ -43,18 +41,6 @@ private:
 
     // hashTable.keys() : []
     static NAN_METHOD(Keys);
-
-    // map.entries() : iterator
-    static NAN_METHOD(MapEntries);
-
-    // map.keys() : iterator
-    static NAN_METHOD(MapKeys);
-
-    // map.values() : iterator
-    static NAN_METHOD(MapValues);
-
-    // map.size : number of elements
-    static NAN_GETTER(MapSize);
 
     // hashTable.remove(key) : boolean
     static NAN_METHOD(Remove);
@@ -76,9 +62,6 @@ private:
 
     // hashTable.forEach(function (key, value) {...}, context) : undefined
     static NAN_METHOD(ForEach);
-
-    // hashTable.forEach(function (key, value) {...}, context) : undefined
-    static NAN_METHOD(MapForEach);
 };
 
 #endif

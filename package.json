@@ -1,11 +1,9 @@
 {
     "name": "hashtable",
-    "version": "1.0.3",
+    "version": "2.0.0",
     "description": "Native HashTable and ES6 compatible Map for Node.js",
     "main": "./index.js",
     "keywords": [
-        "es6-map",
-        "es6",
         "hash",
         "map",
         "hashmap",
@@ -25,18 +23,13 @@
 	    "type": "git",
 	    "url": "git://github.com/chad3814/node-hashtable.git"
     },
-    "engines": {
-        "node": "*"
-    },
     "license": "MIT",
     "dependencies": {
-        "nan": "^1.7.0"
+        "nan": "latest"
     },
     "devDependencies": {
         "test-more": "~0.1.1",
-        "runtests": "~0.1.1",
-        "async": "latest",
-        "es6-map": "latest"
+        "runtests": "~0.1.1"
     },
     "scripts": {
         "install": "node-gyp configure build",
