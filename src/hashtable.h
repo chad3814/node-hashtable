@@ -14,7 +14,7 @@
 #include <nan.h>
 #include "v8_value_hasher.h"
 
-typedef unordered_map<CopyablePersistent *, CopyablePersistent *, v8_value_hash> MapType;
+typedef unordered_map<CopyablePersistent *, CopyablePersistent *, v8_value_hash, v8_value_equal_to> MapType;
 
 class HashTable : public Nan::ObjectWrap {
 public:
