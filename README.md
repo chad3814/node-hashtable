@@ -36,7 +36,7 @@ The hash table implementation is provided by C++11's `unordered_map` class. Curr
 
 ### `put ( key, value )`
 
-Insert a new key/value pair in the hashmap. The key must be a string, and the value can be any javascript type, including objects.
+Insert a new key/value pair in the hashmap. The key can be any javascript type, except undefined and null, including objects. The value can be any javascript type, including objects.
 
 ### `get ( key )`
 
