@@ -4,12 +4,16 @@
 #include <string>
 #include <iostream>
 #ifdef __APPLE__
+#include <AvailabilityMacros.h>
+#endif
+#if defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_12)
 #include <tr1/unordered_map>
 #define unordered_map std::tr1::unordered_map
 #else
 #include <unordered_map>
 #define unordered_map std::unordered_map
 #endif
+
 #include <node.h>
 #include <nan.h>
 #include "v8_value_hasher.h"
