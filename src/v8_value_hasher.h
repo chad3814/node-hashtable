@@ -5,6 +5,9 @@
 #include <iostream>
 #include <node.h>
 #ifdef __APPLE__
+#include <AvailabilityMacros.h>
+#endif
+#if defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_12)
 #include <tr1/unordered_set>
 #define hash std::tr1::hash
 #else
