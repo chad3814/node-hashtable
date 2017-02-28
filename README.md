@@ -62,6 +62,10 @@ Returns the number of key/value pairs in the hash table.
 
 `cb` is an iterator function that will be called with each key/value pair like `cb.call(c, key, value)`, if context is not provided, the global.
 
+### `find ( pred, context )`
+
+`pred` is a predicate function that will be called with each key/value pair like `pred.call(c, key, value)` until `pred` returns true. Returns the value for the first key/value pair to which `pred` returned true, otherwise undefined. If context is not provided, the global.
+
 ### `keys ()`
 Will return an array of the keys stored in the hashtable.
 
