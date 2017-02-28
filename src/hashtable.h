@@ -62,6 +62,9 @@ private:
 
     // hashTable.forEach(function (key, value) {...}, context) : undefined
     static NAN_METHOD(ForEach);
+
+    // hashTable.find(function (key, value) {...}, context) : value
+    static NAN_METHOD(Find);
 };
 
 #endif
