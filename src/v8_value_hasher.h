@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <node.h>
-#ifdef __APPLE__
+#if defined __APPLE__ && __cplusplus < 201103L
 #include <tr1/unordered_set>
 #define hash std::tr1::hash
 #else
