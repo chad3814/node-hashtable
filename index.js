@@ -1,4 +1,4 @@
-var HashTable = require('./build/Release/native').HashTable;
+var HashTable = require('./build/Release/native.node').HashTable;
 HashTable.prototype.toJSON = function() {
     var ret = {};
     this.forEach(function(key, value) {
