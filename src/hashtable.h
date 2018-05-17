@@ -3,7 +3,7 @@
 
 #include <string>
 #include <iostream>
-#ifdef __APPLE__
+#if defined __APPLE__ && __cplusplus < 201103L
 #include <tr1/unordered_map>
 #define unordered_map std::tr1::unordered_map
 #else
@@ -62,6 +62,9 @@ private:
 
     // hashTable.forEach(function (key, value) {...}, context) : undefined
     static NAN_METHOD(ForEach);
+
+    // hashTable.find(function (key, value) {...}, context) : value
+    static NAN_METHOD(Find);
 };
 
 #endif

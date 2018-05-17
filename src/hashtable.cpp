@@ -22,6 +22,7 @@ void HashTable::init(Local<Object> target) {
     Nan::SetPrototypeMethod(constructor, "reserve", Reserve);
     Nan::SetPrototypeMethod(constructor, "max_load_factor", MaxLoadFactor);
     Nan::SetPrototypeMethod(constructor, "forEach", ForEach);
+    Nan::SetPrototypeMethod(constructor, "find", Find);
 
     target->Set(Nan::New("HashTable").ToLocalChecked(), constructor->GetFunction());
 }
@@ -301,6 +302,44 @@ NAN_METHOD(HashTable::ForEach) {
         argv[0] = Local<Value>::New(Isolate::GetCurrent(), *itr->first);
         argv[1] = Local<Value>::New(Isolate::GetCurrent(), *itr->second);
         cb->Call(ctx, argc, argv);
+        itr++;
+    }
+
+    info.GetReturnValue().Set(Nan::Undefined());
+    return;
+}
+
+NAN_METHOD(HashTable::Find) {
+    Nan::HandleScope scope;
+
+    HashTable *obj = Nan::ObjectWrap::Unwrap<HashTable>(info.This());
+
+    if (info.Length() < 1 || !info[0]->IsFunction()) {
+        Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+    Local<Function> predicate = info[0].As<v8::Function>();
+
+    Local<Object> ctx;
+    if (info.Length() > 1 && info[1]->IsObject()) {
+        ctx = info[1]->ToObject();
+    } else {
+        ctx = Nan::GetCurrentContext()->Global();
+    }
+
+    const unsigned argc = 3;
+    Local<Value> argv[argc];
+    argv[2] = info.This();
+
+    MapType::const_iterator itr = obj->map.begin();
+
+    while (itr != obj->map.end()) {
+        argv[0] = Local<Value>::New(Isolate::GetCurrent(), *itr->first);
+        argv[1] = Local<Value>::New(Isolate::GetCurrent(), *itr->second);
+        if (predicate->Call(ctx, argc, argv)->BooleanValue()) {
+            info.GetReturnValue().Set(argv[1]);
+            return;
+        }
         itr++;
     }
 
